@@ -2,6 +2,8 @@ import tkinter as tk
 # from tkinter import 
 from tkinter.ttk import *
 import tkinter.messagebox as tm
+import time
+from astropy.table import Table, Column
 
 class Timely(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -11,7 +13,7 @@ class Timely(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
         self.frames={}
-        for F in (startpage, login_page, my_account):
+        for F in (startpage, login_page, my_account, timer, report):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0,column=0,sticky="nsew")
@@ -46,7 +48,7 @@ class login_page(tk.Frame):
         # txt_name.grid(column=1,row=0)
         self.txt_password = tk.Entry(self,show="*", width=10)
         self.txt_password.pack()
-        # txt_password.grid(column=1,row=1) ????
+        # txt_password.grid(column=1,row=1)
 
         
         log_in = tk.Button(self, text="log in to my account",command=lambda: self.clicked(controller))
@@ -55,12 +57,8 @@ class login_page(tk.Frame):
     def clicked(self,controller):        
         res_name = self.txt_name.get()
         res_password = self.txt_password.get()    
-        if res_name == "john" and res_password == "123456":
+        if res_name == "1" and res_password == "1":
             tm.showinfo("Login info ", "Welcome John")
-            # button_name = tk.Label(window, text="My Account", font="Arial")
-            # button_name.pack(pady=10, padx=10)
-            # button_name = tk.Button(window, text="My Account")
-            # button_name.pack()
             controller.show_frame(my_account)
         else:
             tm.showerror("Login error ", "Incorrect user name or password ")
@@ -72,7 +70,109 @@ class my_account(tk.Frame):
         account = tk.Label(self, text = "My Account", font = ("Arial", 14))
         account.pack(pady=20, padx=20)
 
-    
+#################
+        # web = tk.Label(self, text = "Please enter the website you want to block: ", font = ("Arial", 14))
+        # web.pack(pady=10, padx=10)
+        # self.web_name = tk.Entry(self, width=20)
+        # self.web_name.pack()
+        
+        button = tk.Button(self, text="set", command=lambda: controller.show_frame(timer))
+        button.pack()
+        button_report = tk.Button(self, text="See my report", command=lambda: controller.show_frame(report))
+        button_report.pack()
+    # def block(self, controller):
+    #     path = r'C:\Windows\System32\drivers\etc\hosts'
+
+    #     website= self.web_name.get()
+
+    #     with open(path, 'a') as f:
+    #         f.write(f'127.0.0.1 {website}')
+        # controller.show_frame(timer)
+class report(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        my_report = tk.Label(self, text="My Monthly Report", font=("Arial", 14))
+        my_report.pack()
+        # Month = tk.Button(self, text = "December", command=show)
+        # Month.pack()
+        # label = tk.Label(self, text="High Scores", font=("Arial",30)).grid(row=0, columnspan=3)
+        # create Treeview with 3 columns
+        cols = ('Position', 'Name', 'Score')
+        self.listBox = Treeview(self, columns=cols, show='headings')
+        # set column headings
+        for col in cols:
+            self.listBox.heading(col, text=col)    
+        
+        # listBox.grid(row=1, column=0, columnspan=2)
+
+        showScores = tk.Button(self, text="Show scores", width=15, command= self.show)
+        showScores.pack()
+        # closeButton = tk.Button(self, text="Close", width=15, command=exit).grid(row=4, column=1)
+
+    def show(self):
+
+        tempList = [['Jim', '0.33'], ['Dave', '0.67'], ['James', '0.67'], ['Eden', '0.5']]
+        tempList.sort(key=lambda e: e[1], reverse=True)
+        print(tempList)
+
+        for i, (name, score) in enumerate(tempList, start=1):
+            self.listBox.insert("", "end", values=(i, name, score))
+        self.listBox.pack()
+
+    def table(self, controller):
+        data_rows= [('12/01/18', '100','100'),
+                    ('12/02/18', '60','160'),
+                    ('12/03/18', '30','190'),
+                    ('12/04/18', '180','370'),
+                    ('12/05/18', '60','430'),]
+        cols = ('date','time set', 'cumulative time set')
+        t=Table(rows=data_rows, names = ('date','time set', 'cumulative time set'))
+        listBox = Treeview(data_rows, columns=cols, show='headings')
+        
+        for col in cols:
+            listBox.heading(col, text=col)    
+        listBox.grid(row=1, column=0, columnspan=2)
+
+        # self.time_str = tk.StringVar()
+        # screen = tk.Label(self, textvariable=self.time_str, font="helvetica", bg='white', 
+        # fg='blue', relief='raised', bd=3)
+        # screen.pack(fill='x', padx=5, pady=5)
+        
+
+
+class timer(tk.Frame):
+
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        enter = tk.Label(self, text="Please enter your goal time in seconds: ", font=("Arial", 14))
+        enter.pack()
+        self.my_time = tk.Entry(self, width = 10)
+        self.my_time.pack()
+        # button = tk.Button(self,text = "set goal time", command=lambda: self.count_down(controller))
+        # button.pack()
+        start = tk.Button(self, text='Count Start', command=lambda: self.count_down(controller))
+        start.pack()
+        quit_button = tk.Button(self, text='Quit', command=self.destroy)
+        quit_button.pack()
+        self.time_str = tk.StringVar()
+        screen = tk.Label(self, textvariable=self.time_str, font="helvetica", bg='white', 
+        fg='blue', relief='raised', bd=3)
+        screen.pack(fill='x', padx=5, pady=5)
+
+    def count_down(self, controller):
+        goal =self.my_time.get()
+        print(goal)
+        goaltime= int(goal)
+        for t in range(goaltime, -1, -1):
+            sf = "{:02d}:{:02d}".format(*divmod(t, 60))
+        #print(sf)  # test
+            self.time_str.set(sf)
+        # delay one second
+            self.update()
+            time.sleep(1)
+           
+
+        
 
 
 app = Timely()

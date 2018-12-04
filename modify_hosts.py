@@ -1,7 +1,7 @@
 path = r'C:\Windows\System32\drivers\etc\hosts'
 
-website= 'www.youtube.com'
+website= 'www.cnn.com'
 
 with open(path, 'a') as f:
-    f.write(f'127.0.0.1 {website}')
-    
+    f.write(f'\n127.0.0.1 {website}')
+    print('success!')
