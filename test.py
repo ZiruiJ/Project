@@ -76,7 +76,7 @@ class my_account(tk.Frame):
         # self.web_name = tk.Entry(self, width=20)
         # self.web_name.pack()
         
-        button = tk.Button(self, text="set", command=lambda: controller.show_frame(timer))
+        button = tk.Button(self, text="Set time", command=lambda: controller.show_frame(timer))
         button.pack()
         button_report = tk.Button(self, text="See my report", command=lambda: controller.show_frame(report))
         button_report.pack()
@@ -93,11 +93,13 @@ class report(tk.Frame):
         tk.Frame.__init__(self, parent)
         my_report = tk.Label(self, text="My Monthly Report", font=("Arial", 14))
         my_report.pack()
+        quit_button = tk.Button(self, text='Quit', command=self.destroy)
+        quit_button.pack()
         # Month = tk.Button(self, text = "December", command=show)
         # Month.pack()
         # label = tk.Label(self, text="High Scores", font=("Arial",30)).grid(row=0, columnspan=3)
         # create Treeview with 3 columns
-        cols = ('Position', 'Name', 'Score')
+        cols = ('date', 'set time', 'cumulative set time')
         self.listBox = Treeview(self, columns=cols, show='headings')
         # set column headings
         for col in cols:
@@ -105,13 +107,13 @@ class report(tk.Frame):
         
         # listBox.grid(row=1, column=0, columnspan=2)
 
-        showScores = tk.Button(self, text="Show scores", width=15, command= self.show)
-        showScores.pack()
+        DecReport = tk.Button(self, text="Dec Report", width=15, command= self.show)
+        DecReport.pack()
         # closeButton = tk.Button(self, text="Close", width=15, command=exit).grid(row=4, column=1)
 
     def show(self):
 
-        tempList = [['Jim', '0.33'], ['Dave', '0.67'], ['James', '0.67'], ['Eden', '0.5']]
+        tempList = [['100','100'], ['60','160'], ['30','190'], ['180','370']]
         tempList.sort(key=lambda e: e[1], reverse=True)
         print(tempList)
 
@@ -119,19 +121,18 @@ class report(tk.Frame):
             self.listBox.insert("", "end", values=(i, name, score))
         self.listBox.pack()
 
-    def table(self, controller):
-        data_rows= [('12/01/18', '100','100'),
-                    ('12/02/18', '60','160'),
-                    ('12/03/18', '30','190'),
-                    ('12/04/18', '180','370'),
-                    ('12/05/18', '60','430'),]
-        cols = ('date','time set', 'cumulative time set')
-        t=Table(rows=data_rows, names = ('date','time set', 'cumulative time set'))
-        listBox = Treeview(data_rows, columns=cols, show='headings')
+    # def table(self, controller):
+    #     data_rows= [('12/01/18', '100','100'),
+    #                 ('12/02/18', '60','160'),
+    #                 ('12/03/18', '30','190'),
+    #                 ('12/04/18', '180','370')]
+    #     cols = ('date','time set', 'cumulative time set')
+    #     t=Table(rows=data_rows, names = ('date','time set', 'cumulative time set'))
+    #     listBox = Treeview(data_rows, columns=cols, show='headings')
         
-        for col in cols:
-            listBox.heading(col, text=col)    
-        listBox.grid(row=1, column=0, columnspan=2)
+    #     for col in cols:
+    #         listBox.heading(col, text=col)    
+    #     listBox.grid(row=1, column=0, columnspan=2)
 
         # self.time_str = tk.StringVar()
         # screen = tk.Label(self, textvariable=self.time_str, font="helvetica", bg='white', 
@@ -148,6 +149,12 @@ class timer(tk.Frame):
         enter.pack()
         self.my_time = tk.Entry(self, width = 10)
         self.my_time.pack()
+
+        website= tk.Label(self, text="Please enter the website you want to block: ", font=("Arial", 14))
+        website.pack()
+        self.site = tk.Entry(self, width = 30)
+        self.site.pack()
+
         # button = tk.Button(self,text = "set goal time", command=lambda: self.count_down(controller))
         # button.pack()
         start = tk.Button(self, text='Count Start', command=lambda: self.count_down(controller))
@@ -163,6 +170,16 @@ class timer(tk.Frame):
         goal =self.my_time.get()
         print(goal)
         goaltime= int(goal)
+
+        website_block = self.site.get()
+        path = r'C:\Windows\System32\drivers\etc\hosts'
+
+
+        with open(path, 'a') as f:
+            f.write(f'\n127.0.0.1 {website_block}')
+            print('block success!')
+
+
         for t in range(goaltime, -1, -1):
             sf = "{:02d}:{:02d}".format(*divmod(t, 60))
         #print(sf)  # test
@@ -170,11 +187,14 @@ class timer(tk.Frame):
         # delay one second
             self.update()
             time.sleep(1)
-           
 
+        with open(path, 'w') as f:
+            f.write(f'\n #127.0.0.1 {website_block}')
+            print('unblock success!')
         
-
+           
 
 app = Timely()
 app.mainloop()
+
 
