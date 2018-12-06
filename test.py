@@ -57,7 +57,7 @@ class login_page(tk.Frame):
     def clicked(self,controller):        
         res_name = self.txt_name.get()
         res_password = self.txt_password.get()    
-        if res_name == "1" and res_password == "1":
+        if res_name == "john" and res_password == "123456":
             tm.showinfo("Login info ", "Welcome John")
             controller.show_frame(my_account)
         else:
